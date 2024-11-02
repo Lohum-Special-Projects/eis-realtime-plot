@@ -1,4 +1,10 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -15,34 +21,55 @@ const CameraController = forwardRef<any, CameraControllerProps>(
     const controlsRef = useRef<any>(null);
     const initialCameraPos = useRef(new THREE.Vector3(10, 10, 10));
 
-    const resetCamera = () => {
+    // Enhanced smooth camera movement
+    useEffect(() => {
+      if (controlsRef.current) {
+        controlsRef.current.enableDamping = true;
+        controlsRef.current.dampingFactor = 0.05;
+        controlsRef.current.rotateSpeed = 0.8;
+        controlsRef.current.zoomSpeed = 0.8;
+        controlsRef.current.panSpeed = 0.8;
+        controlsRef.current.minDistance = 5;
+        controlsRef.current.maxDistance = 100;
+        controlsRef.current.enableZoom = true;
+        controlsRef.current.enablePan = true;
+        controlsRef.current.target = new THREE.Vector3(0, 0, 0);
+      }
+    }, []);
+
+    const resetCamera = useCallback(() => {
       if (controlsRef.current && camera) {
-        // Disable auto-rotation temporarily
         const wasAutoRotating = controlsRef.current.autoRotate;
         controlsRef.current.autoRotate = false;
 
-        // Reset camera
-        camera.position.copy(initialCameraPos.current);
-        camera.up.set(0, 1, 0);
+        // Smooth camera reset animation
+        const startPos = camera.position.clone();
+        const endPos = initialCameraPos.current.clone();
+        const startRot = camera.quaternion.clone();
+        const endRot = new THREE.Quaternion().setFromEuler(
+          new THREE.Euler(0, 0, 0)
+        );
 
-        // Reset controls
-        controlsRef.current.target.set(0, 0, 0);
+        let frame = 0;
+        const animate = () => {
+          frame++;
+          const progress = Math.min(frame / 60, 1); // 60 frames for animation
+          const easeProgress = easeOutCubic(progress);
 
-        // Update camera
-        camera.lookAt(0, 0, 0);
-        camera.updateMatrixWorld();
+          camera.position.lerpVectors(startPos, endPos, easeProgress);
+          camera.quaternion.slerpQuaternions(startRot, endRot, easeProgress);
+          camera.updateMatrixWorld();
 
-        // Re-enable auto-rotation if it was enabled
-        controlsRef.current.autoRotate = wasAutoRotating;
-
-        // Force a single update
-        requestAnimationFrame(() => {
-          if (controlsRef.current) {
-            controlsRef.current.update();
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            controlsRef.current.autoRotate = wasAutoRotating;
           }
-        });
+        };
+
+        animate();
       }
-    };
+    }, [camera]);
 
     // Expose resetCamera method to parent
     useImperativeHandle(ref, () => ({
@@ -77,6 +104,11 @@ const CameraController = forwardRef<any, CameraControllerProps>(
     );
   }
 );
+
+// Easing function for smooth animations
+function easeOutCubic(x: number): number {
+  return 1 - Math.pow(1 - x, 3);
+}
 
 CameraController.displayName = "CameraController";
 
