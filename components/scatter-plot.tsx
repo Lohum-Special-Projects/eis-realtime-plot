@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
-import THREE from "three";
+import * as THREE from "three";
 import CameraController from "./cameraController";
 
 interface DataPoint {
