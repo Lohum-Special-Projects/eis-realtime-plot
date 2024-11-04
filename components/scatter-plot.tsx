@@ -24,7 +24,7 @@ interface DataPoint {
   category: string;
 }
 
-interface ScatterPlotProps {
+export interface ScatterPlotProps {
   data: DataPoint[];
   pointSize: number;
   rotationSpeed: number;
@@ -36,7 +36,7 @@ interface ScatterPlotProps {
   };
 }
 
-const Points = memo(function Points({
+export const Points = memo(function Points({
   data,
   pointSize,
   isDark,
@@ -105,7 +105,7 @@ const Points = memo(function Points({
   );
 });
 
-const Controls = memo(function Controls({
+export const Controls = memo(function Controls({
   controls,
   onReset,
 }: {
