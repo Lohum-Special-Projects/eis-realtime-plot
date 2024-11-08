@@ -19,7 +19,7 @@ const CameraController = forwardRef<any, CameraControllerProps>(
   ({ onReset, rotationSpeed, autoRotateSpeed }, ref) => {
     const { camera } = useThree();
     const controlsRef = useRef<any>(null);
-    const initialCameraPos = useRef(new THREE.Vector3(10, 10, 10));
+    const initialCameraPos = useRef(new THREE.Vector3(3, 3, 3));
 
     // Enhanced smooth camera movement
     useEffect(() => {
@@ -27,10 +27,10 @@ const CameraController = forwardRef<any, CameraControllerProps>(
         controlsRef.current.enableDamping = true;
         controlsRef.current.dampingFactor = 0.05;
         controlsRef.current.rotateSpeed = 0.8;
-        controlsRef.current.zoomSpeed = 0.8;
+        controlsRef.current.zoomSpeed = 1.2;
         controlsRef.current.panSpeed = 0.8;
-        controlsRef.current.minDistance = 5;
-        controlsRef.current.maxDistance = 100;
+        controlsRef.current.minDistance = 0.5;
+        controlsRef.current.maxDistance = 20;
         controlsRef.current.enableZoom = true;
         controlsRef.current.enablePan = true;
         controlsRef.current.target = new THREE.Vector3(0, 0, 0);
@@ -89,11 +89,14 @@ const CameraController = forwardRef<any, CameraControllerProps>(
         ref={controlsRef}
         autoRotate={rotationSpeed > 0}
         autoRotateSpeed={autoRotateSpeed}
-        enableDamping
+        enableDamping={true}
         dampingFactor={0.05}
-        minDistance={5}
-        maxDistance={100}
+        minDistance={0.5}
+        maxDistance={20}
+        zoomSpeed={1.2} // Faster zoom
         makeDefault
+        minPolarAngle={0} // Allow full vertical rotation
+        maxPolarAngle={Math.PI}
         onChange={() => {
           // Prevent infinite loops by not calling update here
           if (controlsRef.current) {

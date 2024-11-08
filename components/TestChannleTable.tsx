@@ -12,7 +12,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { dynamoQueries } from "@/lib/dynamo-client";
-import { RefreshCw, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
+import {
+  RefreshCw,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  BarChart3,
+  Box,
+} from "lucide-react";
 import debounce from "lodash/debounce";
 import { parseTestChannelCombination } from "@/lib/dynamo-utils";
 import { TestChannelCombination } from "@/types/dynamo-types";
@@ -229,18 +237,19 @@ const TestChannelTable = () => {
                 <TableHead>Test ID</TableHead>
                 <TableHead>Channel ID</TableHead>
                 <TableHead>Full Key</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">
+                  <TableCell colSpan={4} className="text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : paginatedData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">
+                  <TableCell colSpan={4} className="text-center">
                     No combinations found
                   </TableCell>
                 </TableRow>
@@ -251,13 +260,42 @@ const TestChannelTable = () => {
                   return (
                     <TableRow
                       key={item.GSI1SK}
-                      className="cursor-pointer hover:bg-muted/50 transition-colors"
-                      onClick={() => handleRowClick(testId, channelId)}
+                      className="hover:bg-muted/50 transition-colors"
                     >
                       <TableCell>{testId}</TableCell>
                       <TableCell>{channelId}</TableCell>
                       <TableCell className="font-mono text-sm">
                         {fullKey}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(
+                                `/vis?testId=${testId}&channelId=${channelId}`
+                              );
+                            }}
+                          >
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            2D Plots
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(
+                                `/visualization?testId=${testId}&channelId=${channelId}`
+                              );
+                            }}
+                          >
+                            <Box className="h-4 w-4 mr-2" />
+                            3D View
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

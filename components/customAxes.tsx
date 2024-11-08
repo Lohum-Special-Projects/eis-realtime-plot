@@ -44,12 +44,12 @@ const TickMark = memo(function TickMark({
         <lineBasicMaterial color={tickColor} linewidth={2} />
       </line>
       <Text
-        position={[0, -tickSize * 2, 0]}
-        scale={[0.7, 0.7, 0.7]}
+        position={[0, -tickSize * 1.5, 0]}
+        scale={[0.1, 0.1, 0.1]}
         color={textColor}
         anchorX="center"
         anchorY="top"
-        fontSize={0.5}
+        fontSize={0.4}
       >
         {value.toFixed(1)}
       </Text>
@@ -58,10 +58,10 @@ const TickMark = memo(function TickMark({
 });
 
 const CustomAxes = memo(function CustomAxes({
-  size = 10,
+  size = 1,
   ticks = 5,
-  tickSize = 0.2,
-  labels = { x: "X", y: "Y", z: "Z" },
+  tickSize = 0.02,
+  labels = { x: "X Axis", y: "Y Axis", z: "Z Axis" },
 }: CustomAxesProps) {
   const { theme } = useTheme();
 
@@ -120,6 +120,8 @@ const CustomAxes = memo(function CustomAxes({
         ))}
       </group>
 
+      <axesHelper args={[size]} />
+
       {/* Ticks */}
       {ticksArray.map((tick) => (
         <group key={tick}>
@@ -168,9 +170,9 @@ const CustomAxes = memo(function CustomAxes({
         <Text
           key={index}
           position={label.position}
-          scale={[1.2, 1.2, 1.2] as const}
+          scale={[0.15, 0.15, 0.15] as const}
           color={label.color}
-          fontSize={0.8}
+          fontSize={0.5}
         >
           {label.text}
         </Text>

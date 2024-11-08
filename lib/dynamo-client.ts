@@ -26,9 +26,10 @@ export interface DataPoint {
   UpdatedAt: string;
   Test_ID: number;
   Channel_ID: number;
-  // Allow any additional properties
+  EIS_Data_Point: number;
   [key: string]: any;
 }
+
 export const dynamoQueries = {
   async getAllTestChannelCombinations({
     filters,

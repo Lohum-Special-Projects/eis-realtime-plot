@@ -41,7 +41,6 @@ export function NyquistPlot({
   isLoading,
   highlightedPoints = [],
 }: NyquistPlotProps) {
-  // Sort data by EIS_Data_Point before plotting
   const plotData = [...data]
     .sort((a, b) => a.EIS_Data_Point - b.EIS_Data_Point)
     .map((point) => ({
@@ -117,15 +116,15 @@ export function NyquistPlot({
             line={{
               stroke: "hsl(var(--primary))",
               strokeWidth: 1,
-              type: "linear", // Changed to linear for smoother lines
+              type: "linear",
             }}
             lineJointType="linear"
           />
           <Scatter
             name="New Points"
             data={plotData.filter((p) => p.isNew)}
-            fill="hsl(var(--primary))"
-            stroke="hsl(var(--primary))"
+            fill="hsl(var(--destructive))" // Using destructive color for contrast
+            stroke="hsl(var(--destructive))"
             strokeWidth={2}
             r={8}
           />
