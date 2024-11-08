@@ -1,5 +1,6 @@
 "use client";
 
+import TestChannelTable from "@/components/TestChannleTable";
 import { ThemeToggle } from "@/components/themeToggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +29,7 @@ export default function Home() {
         <ThemeToggle />
       </div>
 
-      <div className="h-full flex items-center justify-center">
+      <div className="flex flex-col items-center gap-8 max-w-7xl mx-auto">
         <Card className="w-full max-w-2xl">
           <CardHeader className="text-center">
             <CardTitle className="text-4xl font-bold tracking-tight font-sans">
@@ -52,6 +53,10 @@ export default function Home() {
             </Button>
           </CardContent>
         </Card>
+
+        <div className="w-full max-w-7xl">
+          <TestChannelTable />
+        </div>
       </div>
     </div>
   );

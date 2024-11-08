@@ -11,7 +11,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 5000,
+            staleTime: 0,
+            refetchOnWindowFocus: false,
+            retry: false,
           },
         },
       })
@@ -22,7 +24,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         {children}
       </ThemeProvider>
-
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
