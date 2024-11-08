@@ -1,4 +1,4 @@
-import { TestChannelCombination } from "@/app/types/dynamo-types";
+import { TestChannelCombination } from "@/types/dynamo-types";
 import { DynamoDB } from "aws-sdk";
 
 const config = {
@@ -17,6 +17,18 @@ interface SearchFilters {
   channelId?: string;
 }
 
+export interface DataPoint {
+  PK: string;
+  SK: string;
+  Zreal: number;
+  Zimg: number;
+  Frequency: number;
+  UpdatedAt: string;
+  Test_ID: number;
+  Channel_ID: number;
+  // Allow any additional properties
+  [key: string]: any;
+}
 export const dynamoQueries = {
   async getAllTestChannelCombinations({
     filters,
@@ -70,5 +82,43 @@ export const dynamoQueries = {
     } while (lastEvaluatedKey);
 
     return items;
+  },
+
+  async getTestChannelData(
+    testId: string,
+    channelId: string
+  ): Promise<DataPoint[]> {
+    const params: DynamoDB.DocumentClient.QueryInput = {
+      TableName: TABLE_NAME,
+      KeyConditionExpression: "PK = :pk",
+      ExpressionAttributeValues: {
+        ":pk": `TEST#${testId}#${channelId}`,
+      },
+      ScanIndexForward: true,
+    };
+
+    try {
+      const items: DataPoint[] = [];
+      let lastEvaluatedKey: Record<string, any> | undefined;
+
+      do {
+        if (lastEvaluatedKey) {
+          params.ExclusiveStartKey = lastEvaluatedKey;
+        }
+
+        const response = await dynamoClient.query(params).promise();
+
+        if (response.Items) {
+          items.push(...(response.Items as DataPoint[]));
+        }
+
+        lastEvaluatedKey = response.LastEvaluatedKey;
+      } while (lastEvaluatedKey);
+
+      return items;
+    } catch (error) {
+      console.error("Error fetching data points:", error);
+      throw error;
+    }
   },
 };

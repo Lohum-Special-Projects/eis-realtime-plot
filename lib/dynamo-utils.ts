@@ -3,7 +3,7 @@
 import {
   ParsedTestChannel,
   TestChannelCombination,
-} from "@/app/types/dynamo-types";
+} from "@/types/dynamo-types";
 
 export function parseTestChannelCombination(
   item: TestChannelCombination

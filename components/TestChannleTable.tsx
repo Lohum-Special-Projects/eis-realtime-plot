@@ -15,7 +15,8 @@ import { dynamoQueries } from "@/lib/dynamo-client";
 import { RefreshCw, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import debounce from "lodash/debounce";
 import { parseTestChannelCombination } from "@/lib/dynamo-utils";
-import { TestChannelCombination } from "@/app/types/dynamo-types";
+import { TestChannelCombination } from "@/types/dynamo-types";
+import { useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 30;
 
@@ -26,6 +27,12 @@ const TestChannelTable = () => {
   const [channelIdInput, setChannelIdInput] = useState("");
   const [testIdSearch, setTestIdSearch] = useState("");
   const [channelIdSearch, setChannelIdSearch] = useState("");
+
+  const router = useRouter();
+
+  const handleRowClick = (testId: string, channelId: string) => {
+    router.push(`/vis?testId=${testId}&channelId=${channelId}`);
+  };
 
   // Create stable debounced search function
   const debouncedSearch = useCallback(
@@ -104,7 +111,24 @@ const TestChannelTable = () => {
 
   // Sort data
   const sortedAndFilteredData = useMemo(() => {
-    return [...allItems].sort((a, b) => {
+    // Create a map to store the latest entry for each Test/Channel combination
+    const latestEntries = new Map<string, TestChannelCombination>();
+
+    // Process all items to keep only the latest entry for each combination
+    allItems.forEach((item) => {
+      const { testId, channelId } = parseTestChannelCombination(item);
+      const key = `${testId}#${channelId}`;
+
+      if (
+        !latestEntries.has(key) ||
+        new Date(item.UpdatedAt) > new Date(latestEntries.get(key)!.UpdatedAt)
+      ) {
+        latestEntries.set(key, item);
+      }
+    });
+
+    // Convert map values back to array and sort
+    return Array.from(latestEntries.values()).sort((a, b) => {
       const aData = parseTestChannelCombination(a);
       const bData = parseTestChannelCombination(b);
       // First sort by test ID
@@ -225,7 +249,11 @@ const TestChannelTable = () => {
                   const { testId, channelId, fullKey } =
                     parseTestChannelCombination(item);
                   return (
-                    <TableRow key={item.GSI1SK}>
+                    <TableRow
+                      key={item.GSI1SK}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => handleRowClick(testId, channelId)}
+                    >
                       <TableCell>{testId}</TableCell>
                       <TableCell>{channelId}</TableCell>
                       <TableCell className="font-mono text-sm">
